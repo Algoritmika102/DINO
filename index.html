@@ -133,22 +133,44 @@
         });
       }, 2000);
     }
+function checkCollision(playerHitbox, enemyHitbox, playerLane, enemyLane) {
+  const overlapX = playerHitbox.right > enemyHitbox.left && playerHitbox.left < enemyHitbox.right;
+  const overlapY = playerHitbox.bottom > enemyHitbox.top && playerHitbox.top < enemyHitbox.bottom;
+    return overlapX && overlapY && playerLane === enemyLane;
+}
 
-    function gameLoop() {
-      setInterval(() => {
-        const playerRect = player.getBoundingClientRect();
-        enemies.forEach(enemy => {
-          const enemyRect = enemy.getBoundingClientRect();
-          const overlapX = playerRect.right > enemyRect.left && playerRect.left < enemyRect.right;
-          const overlapY = playerRect.bottom > enemyRect.top && playerRect.top < enemyRect.bottom;
-          if (overlapX && overlapY && parseInt(enemy.dataset.lane) === currentLane) {
-            alert('Game Over!');
-            window.location.reload();
-// создать цикл и прописать условия если, то
-          }
-        });
-      }, 100);
-    }
+function gameLoop() {
+  setInterval(() => {
+    const playerRect = player.getBoundingClientRect();
+    const playerHitbox = {
+      left: playerRect.left + 10, // Пример смещения хитбокса
+      top: playerRect.top + 10,
+      right: playerRect.right - 10,
+      bottom: playerRect.bottom - 10,
+    };
+    const playerLane = currentLane;
+
+    enemies.forEach(enemyElement => {
+      const enemyRect = enemyElement.getBoundingClientRect();
+      const enemyHitbox = {
+        left: enemyRect.left + 10,
+        top: enemyRect.top + 10,
+        right: enemyRect.right - 10,
+        bottom: enemyRect.bottom - 10,
+      };
+      const enemyLane = parseInt(enemyElement.dataset.lane);
+
+      if (checkCollision(playerHitbox, enemyHitbox, playerLane, enemyLane)) {
+        handleCollision();
+      }
+    });
+  }, 100);
+}
+
+function handleCollision() {
+  alert('Game Over!');
+  window.location.reload();
+}
 
     window.addEventListener('keydown', e => {
       if (!gameStarted) startGame();
